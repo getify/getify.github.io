@@ -5,7 +5,7 @@
 	function buildit() {
 		var src = $source.val();
 		src = btoa(src);
-		$showmeurl.val("http://getify.github.io/showme.html#data:text/html;charset=utf-8;base64," + src);
+		$showmeurl.val("http://getify.github.io/showme.html?" + encodeURIComponent("data:text/html;charset=utf-8;base64," + src));
 	}
 
 	var $source, $showmeurl;

@@ -2,8 +2,8 @@
 
 (function(global){
 	var str;
-	if (document.location.hash) {
-		str = document.location.hash.replace(/^#/,"");
+	if (document.location.search) {
+		str = decodeURIComponent(document.location.search.replace(/^\?/,""));
 		if (str.match(/^data:text\/html.*?base64,/)) {
 			str = str.replace(/^data:text\/html.*?base64,/,"");
 			str = atob(str);
