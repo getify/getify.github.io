@@ -6,7 +6,9 @@
 		str = document.location.hash.replace(/^#/,"");
 		if (str.match(/^data:text\/html.*?base64,/)) {
 			str = str.replace(/^data:text\/html.*?base64,/,"");
-			document.write(atob(str));
+			str = atob(str);
+			$("#showcode").text(str);
+			document.write(str);
 		}
 	}
 })(window);
