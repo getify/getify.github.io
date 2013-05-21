@@ -5,7 +5,7 @@
 	if (document.location.hash) {
 		str = document.location.hash.replace(/^#/,"");
 		if (str.match(/^data:text\/html.*?base64,/)) {
-			str = str.replace(/^data:text\/html.*?base64,/);
+			str = str.replace(/^data:text\/html.*?base64,/,"");
 			document.write(atob(str));
 		}
 	}
