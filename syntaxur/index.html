@@ -1,1 +1,54 @@
-<h1>Syntaxur</h1>
+<!DOCTYPE html>
+<html>
+<head>
+<title>syntaxur</title>
+<style>
+textarea { font-family:monospace; font-size:15px; }
+pre { border:1px solid black; padding:10px; }
+code { white-space:pre-wrap; font-family:monospace; font-size:15px; }
+</style>
+</head>
+<body>
+<h1>syntaxur</h1>
+
+<p>
+	<textarea id="source" cols="100" rows="20"></textarea>
+</p>
+<p>
+	<input id="format" type="button" value="syntaxur">
+</p>
+<p>
+	<div id="time"></div>
+	<pre><code></code></pre>
+</p>
+
+<script src="node_modules/literalizer/lib/lit.js"></script>
+<script src="syntaxur.js"></script>
+<script src="jquery.js"></script>
+<script>
+$("#format").click(function(evt){
+	evt.preventDefault();
+	evt.stopImmediatePropagation();
+
+	$("code").empty();
+	$("#time").text("Clearing out DOM...");
+
+	setTimeout(function(){
+		$("#time").text("Highlighting...");
+
+		setTimeout(function(){
+			var source = $("#source").val(), html, t1;
+
+			t1 = Date.now();
+			html = Syntaxur.highlight(source);
+			t2 = Date.now();
+
+			$("#time").text("Highlighting (not including DOM manipulation) took: " + (t2-t1) + "ms");
+			$("code").html(html);
+		});
+	},500);
+});
+</script>
+
+</body>
+</html>
