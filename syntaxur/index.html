@@ -15,7 +15,8 @@ code { white-space:pre-wrap; font-family:monospace; font-size:15px; }
 	<textarea id="source" cols="100" rows="20"></textarea>
 </p>
 <p>
-	<input id="format" type="button" value="syntaxur">
+	<input id="format" type="button" value="syntaxur">&nbsp;&nbsp;&nbsp;
+	<input id="reset" type="reset" value="reset">
 </p>
 <p>
 	<div id="time"></div>
@@ -26,6 +27,7 @@ code { white-space:pre-wrap; font-family:monospace; font-size:15px; }
 <script src="syntaxur.js"></script>
 <script src="jquery.js"></script>
 <script>
+
 $("#format").click(function(evt){
 	evt.preventDefault();
 	evt.stopImmediatePropagation();
@@ -48,6 +50,16 @@ $("#format").click(function(evt){
 		});
 	},500);
 });
+
+$("#reset").click(function(evt){
+	evt.preventDefault();
+	evt.stopImmediatePropagation();
+
+	$("#source").val("");
+	$("code").empty();
+	$("#time").empty();
+});
+
 </script>
 
 </body>
