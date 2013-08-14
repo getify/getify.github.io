@@ -1,5 +1,5 @@
 /*! literalizer
-    v0.2.0-b (c) Kyle Simpson
+    v0.2.1-a (c) Kyle Simpson
     MIT License: http://getify.mit-license.org
 */
 
@@ -42,12 +42,12 @@
 			// new-line?
 			(
 				tok.type === TOKEN_SPECIAL &&
-				tok.val.match(/^(?:\r?\n)+$/)
+				/^(?:\r?\n)+$/.test(tok.val)
 			) ||
 			// whitespace?
 			(
 				tok.type === SEGMENT_GENERAL &&
-				tok.val.match(/^\s*$/)
+				/^\s*$/.test(tok.val)
 			) ||
 			// comment?
 			tok.type === SEGMENT_COMMENT
@@ -214,7 +214,7 @@
 							if (tok.type === TOKEN_SPECIAL) {
 								// preceding if/while/for/with keyword implies
 								// a valid regex literal
-								if (tok.val.match(/^(?:if|while|for|with)$/)) {
+								if (/^(?:if|while|for|with)$/.test(tok.val)) {
 									return true;
 								}
 								// otherwise, NOT a valid regex literal
@@ -331,7 +331,7 @@
 					}
 				}
 				// is preceeding special-token a keyword or punctuator/operator?
-				else if (tok.val.match(/^(?:\b(?:return|throw|delete|in|else|void|typeof|yield|case|debugger|break|continue)\b|\=\>|[+\-*\/=~!%&,\|;:\?<>\(\{\[])$/)) {
+				else if (/^(?:\b(?:return|throw|delete|in|else|void|typeof|yield|case|debugger|break|continue)\b|\=\>|[+\-*\/=~!%&,\|;:\?<>\(\{\[])$/.test(tok.val)) {
 					return true;
 				}
 				// otherwise, NOT a valid regex literal
@@ -361,7 +361,7 @@
 						// more tokens than just the unmatched one?
 						tokens.length > 1 &&
 						// valid identifier (and optional surrounding whitespace)?
-						unmatched.match(/^\s*[^0-9\s\(\)\[\]\{\}<>,.:;=~+\-\*\/!%&\|\?\"\'][^\s\(\)\[\]\{\}<>,.:;=~+\-\*\/!%&\|\?\"\']*\s*$/)
+						/^\s*[^0-9\s\(\)\[\]\{\}<>,.:;=~+\-\*\/!%&\|\?\"\'][^\s\(\)\[\]\{\}<>,.:;=~+\-\*\/!%&\|\?\"\']*\s*$/.test(unmatched)
 					) {
 						// if block is allowed and an identifier is found,
 						// it's a block-label candidate
@@ -422,9 +422,9 @@
 					previous_newline = false;
 				}
 				// number literal candidate?
-				else if (match[0].match(/^(?:(?:0[xX][0-9a-fA-F]+)|(?:0[oO][0-7]+)|(?:0[bB][01]+)|(?:\d+\.\d*(?:[eE][+-]?\d+)?)|(?:\.\d+(?:[eE][+-]?\d+)?)|(?:\d+(?:[eE][+-]?\d+)?))$/)) {
+				else if (/^(?:(?:0[xX][0-9a-fA-F]+)|(?:0[oO][0-7]+)|(?:0[bB][01]+)|(?:\d+\.\d*(?:[eE][+-]?\d+)?)|(?:\.\d+(?:[eE][+-]?\d+)?)|(?:\d+(?:[eE][+-]?\d+)?))$/.test(match[0])) {
 					// number appears separate from an identifier?
-					if (!left_context.match(/[^\s\(\)\[\]\{\}<>,.:;=~+\-\*\/!%&\|\?\"\']$/)) {
+					if (!/[^\s\(\)\[\]\{\}<>,.:;=~+\-\*\/!%&\|\?\"\']$/.test(left_context)) {
 						segments.push({
 							type: SEGMENT_NUMBER_LITERAL,
 							val: match[0]
@@ -448,7 +448,7 @@
 					previous_newline = false;
 				}
 				// special token?
-				else if (match[0].match(/^(?:\b(?:return|throw|delete|in|else|void|typeof|yield|function|if|do|while|for|with|case|debugger|break|continue)\b|\=\>|[+\-*=~!%&,\|;:\?<>\(\)\{\}\[\]]|(?:\r?\n)+)$/)) {
+				else if (/^(?:\b(?:return|throw|delete|in|else|void|typeof|yield|function|if|do|while|for|with|case|debugger|break|continue)\b|\=\>|[+\-*=~!%&,\|;:\?<>\(\)\{\}\[\]]|(?:\r?\n)+)$/.test(match[0])) {
 					saveText(match[0]);
 					tokens.push({
 						type: TOKEN_SPECIAL,
@@ -465,7 +465,7 @@
 					}
 					else {
 						// new-line?
-						if (match[0].match(/^(?:\r?\n)+$/)) {
+						if (/^(?:\r?\n)+$/.test(match[0])) {
 							previous_newline = true;
 						}
 						else {
@@ -487,7 +487,7 @@
 									}
 								}
 								// disqualifier for subsequent statement block?
-								else if (match[0].match(/^[\(\[+\-*\/%&\|=,]$/)) {
+								else if (/^[\(\[+\-*\/%&\|=,]$/.test(match[0])) {
 									block_allowed = false;
 								}
 								// otherwise, subsequent statement block allowed
@@ -554,10 +554,10 @@
 				left_context = code.slice(0,next_match_idx - match[0].length);
 
 				// is the match at the beginning or is it NOT escaped?
-				if (!left_context || left_context.match(not_escaped_pattern)) {
+				if (!left_context || not_escaped_pattern.test(left_context)) {
 					// an unescaped new-line in a file's string literal
 					// is a syntax error
-					if (match[0].match(/\r?\n/)) {
+					if (/\r?\n/.test(match[0])) {
 						public_api.warnings.push("Unterminated string literal: " + segments[segments.length-1].val);
 						next_match_idx -= match[0].length;
 						prev_match_idx = next_match_idx;
@@ -596,7 +596,7 @@
 				left_context = code.slice(0,next_match_idx - match[0].length);
 
 				// is the match at the beginning or is it NOT escaped?
-				if (!left_context || left_context.match(not_escaped_pattern)) {
+				if (!left_context || not_escaped_pattern.test(left_context)) {
 					lexing_state = STATE_GENERAL;
 				}
 			}
@@ -611,19 +611,19 @@
 				left_context = code.slice(0,next_match_idx - match[0].length);
 
 				// any new-line in a file's regex literal is a syntax error
-				if (match[0].match(/\r?\n/)) {
+				if (/\r?\n/.test(match[0])) {
 					public_api.warnings.push("Unterminated regular expression literal: " + segments[segments.length-1].val);
 					next_match_idx -= match[0].length;
 					prev_match_idx = next_match_idx;
 					lexing_state = STATE_GENERAL;
 				}
 				// unescaped [ ?
-				else if (match[0] === "[" && left_context.match(not_escaped_pattern)) {
+				else if (match[0] === "[" && not_escaped_pattern.test(left_context)) {
 					segments[segments.length-1].val += match[0];
 					regex_character_class = true;
 				}
 				// unescaped ] ?
-				else if (match[0] === "]" && left_context.match(not_escaped_pattern)) {
+				else if (match[0] === "]" && not_escaped_pattern.test(left_context)) {
 					segments[segments.length-1].val += match[0];
 					regex_character_class = false;
 				}
@@ -636,7 +636,7 @@
 					if (!regex_character_class &&
 						(
 							!left_context ||
-							left_context.match(not_escaped_pattern)
+							not_escaped_pattern.test(left_context)
 						)
 					) {
 						lexing_state = STATE_GENERAL;
