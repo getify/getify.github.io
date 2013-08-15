@@ -1,5 +1,5 @@
 /*! literalizer
-    v0.2.1-a (c) Kyle Simpson
+    v0.2.2-a (c) Kyle Simpson
     MIT License: http://getify.mit-license.org
 */
 
@@ -296,7 +296,7 @@
 
 									if (
 										// preceding is not a `function` keyword?
-										tokens[tok_idx].val !== "function" ||
+										!/function(?:\s*\*)?/.test(tokens[tok_idx].val) ||
 										// preceding `function` is a declaration?
 										tokens[tok_idx].is_decl
 									) {
@@ -331,7 +331,7 @@
 					}
 				}
 				// is preceeding special-token a keyword or punctuator/operator?
-				else if (/^(?:\b(?:return|throw|delete|in|else|void|typeof|yield|case|debugger|break|continue)\b|\=\>|[+\-*\/=~!%&,\|;:\?<>\(\{\[])$/.test(tok.val)) {
+				else if (/^(?:\b(?:new|return|throw|delete|in|else|void|typeof|yield|case|debugger|break|continue)\b|=>|[+\-*\/=~!%&,\|;:\?<>\(\{\[])$/.test(tok.val)) {
 					return true;
 				}
 				// otherwise, NOT a valid regex literal
@@ -448,59 +448,70 @@
 					previous_newline = false;
 				}
 				// special token?
-				else if (/^(?:\b(?:return|throw|delete|in|else|void|typeof|yield|function|if|do|while|for|with|case|debugger|break|continue)\b|\=\>|[+\-*=~!%&,\|;:\?<>\(\)\{\}\[\]]|(?:\r?\n)+)$/.test(match[0])) {
+				else if (/^(?:\b(?:new|return|throw|delete|in|else|void|typeof|yield|if|do|while|for|with|case|debugger|break|continue)\b|\bfunction(?:\s*\*)?|=>|[+\-*=~!%&,\|;:\?<>\(\)\{\}\[\]]|(?:\r?\n)+)$/.test(match[0])) {
 					saveText(match[0]);
 					tokens.push({
 						type: TOKEN_SPECIAL,
 						val: match[0]
 					});
 
-					if (match[0] === "function") {
+					// function?
+					if (/function(?:\s*\*)?/.test(match[0])) {
 						// NOTE: wherever a statement block can appear,
-						// a function declaration can appear... right? :)
+						// a function declaration can appear, and only there.
 						tokens[tokens.length-1].is_decl = block_allowed;
+
 						previous_newline = false;
 						previous_opening_brace = false;
 						previous_statement_block_label_candidate = false;
 					}
+					// `new` operator?
+					else if (match[0] === "new") {
+						block_allowed = false;
+						previous_opening_brace = true;
+						previous_newline = true;
+						previous_statement_block_label_candidate = false;
+					}
+					// new-line?
+					else if (/^(?:\r?\n)+$/.test(match[0])) {
+						previous_opening_brace = true;
+						previous_newline = true;
+					}
+					// opening { brace?
+					else if (match[0] === "{") {
+						// NOTE: if a block is allowed right now, the {
+						// brace must be starting a block.
+						tokens[tokens.length-1].is_block = block_allowed;
+
+						previous_opening_brace = true;
+						previous_newline = false;
+						previous_statement_block_label_candidate = false;
+					}
 					else {
-						// new-line?
-						if (/^(?:\r?\n)+$/.test(match[0])) {
-							previous_newline = true;
-						}
-						else {
-							if (match[0] === "{") {
-								previous_opening_brace = true;
-								tokens[tokens.length-1].is_block = block_allowed;
+						// : is possibly a qualifier for subsequent statement block?
+						if (match[0] === ":") {
+							// is : part of a statement block label?
+							if (previous_statement_block_label_candidate) {
+								// subsequent statement block allowed
+								block_allowed = true;
 							}
 							else {
-								// : is possibly a qualifier for subsequent statement block
-								if (match[0] === ":") {
-									// is : part of a statement block label?
-									if (previous_statement_block_label_candidate) {
-										// subsequent statement block allowed
-										block_allowed = true;
-									}
-									else {
-										// subsequent statement block not allowed
-										block_allowed = false;
-									}
-								}
-								// disqualifier for subsequent statement block?
-								else if (/^[\(\[+\-*\/%&\|=,]$/.test(match[0])) {
-									block_allowed = false;
-								}
-								// otherwise, subsequent statement block allowed
-								else {
-									block_allowed = true;
-								}
-
-								previous_opening_brace = false;
+								// subsequent statement block not allowed
+								block_allowed = false;
 							}
-
-							previous_newline = false;
-							previous_statement_block_label_candidate = false;
 						}
+						// disqualifier for subsequent statement block?
+						else if (/^(?:[\(\[+\-*\/%&\|=,]|=>)$/.test(match[0])) {
+							block_allowed = false;
+						}
+						// otherwise, subsequent statement block allowed
+						else {
+							block_allowed = true;
+						}
+
+						previous_opening_brace = false;
+						previous_newline = false;
+						previous_statement_block_label_candidate = false;
 					}
 				}
 				// starting a regex-literal segment (candidate)?
@@ -752,7 +763,7 @@
 
 		STATE_PATTERNS = [
 			// general
-			/\b(?:return|throw|delete|in|else|void|typeof|yield|function|if|while|for|with|case|debugger|break|continue)\b|\/\/|\/\*|\=\>|[`"'+\-*\/=~!%&,\|;:\?<>\(\)\{\}\[\]]|(?:0[xX][0-9a-fA-F]+)|(?:0[oO][0-7]+)|(?:0[bB][01]+)|(?:\d+\.\d*(?:[eE][+-]?\d+)?)|(?:\.\d+(?:[eE][+-]?\d+)?)|(?:\d+(?:[eE][+-]?\d+)?)/g,
+			/\b(?:new|return|throw|delete|in|else|void|typeof|yield|if|while|for|with|case|debugger|break|continue)\b|\bfunction(?:\s*\*)|\/\/|\/\*|=>|[`"'+\-*\/=~!%&,\|;:\?<>\(\)\{\}\[\]]|(?:0[xX][0-9a-fA-F]+)|(?:0[oO][0-7]+)|(?:0[bB][01]+)|(?:\d+\.\d*(?:[eE][+-]?\d+)?)|(?:\.\d+(?:[eE][+-]?\d+)?)|(?:\d+(?:[eE][+-]?\d+)?)/g,
 			/\r?\n/g,						// end of single-line comment
 			/\*\//g,						// end of multi-line comment
 			null,							// (placeholder) end of string literal
