@@ -1,5 +1,5 @@
 /*! literalizer
-    v0.2.2-a (c) Kyle Simpson
+    v0.2.2-b (c) Kyle Simpson
     MIT License: http://getify.mit-license.org
 */
 
@@ -763,7 +763,7 @@
 
 		STATE_PATTERNS = [
 			// general
-			/\b(?:new|return|throw|delete|in|else|void|typeof|yield|if|while|for|with|case|debugger|break|continue)\b|\bfunction(?:\s*\*)|\/\/|\/\*|=>|[`"'+\-*\/=~!%&,\|;:\?<>\(\)\{\}\[\]]|(?:0[xX][0-9a-fA-F]+)|(?:0[oO][0-7]+)|(?:0[bB][01]+)|(?:\d+\.\d*(?:[eE][+-]?\d+)?)|(?:\.\d+(?:[eE][+-]?\d+)?)|(?:\d+(?:[eE][+-]?\d+)?)/g,
+			/\b(?:new|return|throw|delete|in|else|void|typeof|yield|if|while|for|with|case|debugger|break|continue)\b|\bfunction(?:\s*\*)?|\/\/|\/\*|=>|[`"'+\-*\/=~!%&,\|;:\?<>\(\)\{\}\[\]]|(?:0[xX][0-9a-fA-F]+)|(?:0[oO][0-7]+)|(?:0[bB][01]+)|(?:\d+\.\d*(?:[eE][+-]?\d+)?)|(?:\.\d+(?:[eE][+-]?\d+)?)|(?:\d+(?:[eE][+-]?\d+)?)/g,
 			/\r?\n/g,						// end of single-line comment
 			/\*\//g,						// end of multi-line comment
 			null,							// (placeholder) end of string literal
