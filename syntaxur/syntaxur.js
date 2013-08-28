@@ -13,7 +13,74 @@
 		return code.replace(/</g,"&lt;");
 	}
 
+	// test for non-empty, non-whitespace, non-comment token
+	function isUsefulSegment(seg) {
+		if (
+			!seg.val ||
+			// only whitespace?
+			(
+				seg.type === LIT.SEGMENT.GENERAL &&
+				/^\s+$/.test(seg.val)
+			) ||
+			// comment?
+			seg.type === LIT.SEGMENT.COMMENT
+		) {
+			console.log("not useful: " + JSON.stringify(seg));
+			return false;
+		}
+		else {
+			console.log("useful: " + JSON.stringify(seg));
+			return true;
+		}
+	}
+
 	function identifyOtherSegments(segments) {
+
+		// find previous useful segment
+		function findUsefulSegment(segIdx) {
+			while (
+				segIdx >= 0 &&
+				!isUsefulSegment(segments[segIdx])
+			) {
+				segIdx--;
+			}
+
+			// did we find one?
+			if (segIdx >= 0) {
+				return segIdx;
+			}
+			else {
+				return false;
+			}
+		}
+
+		function precedingDotOperator(leftContext) {
+			var dot_operator = /\.\s*$/, prev_seg_idx;
+
+			// is there left-context text to examine,
+			// and does it have a preceding . in it?
+			if (leftContext) {
+				if (dot_operator.test(leftContext)) {
+					return true;
+				}
+			}
+			// otherwise, any previous segments to consult?
+			else if (segment_idx > 0) {
+				prev_seg_idx = findUsefulSegment(segment_idx-1);
+
+				// preceding . appears in a previous segment
+				// (that isn't a a number literal)?
+				if (
+					prev_seg_idx !== false &&
+					dot_operator.test(segments[prev_seg_idx].val) &&
+					segments[prev_seg_idx].type !== LIT.SEGMENT.NUMBER_LITERAL
+				) {
+					return true;
+				}
+			}
+
+			return false;
+		}
 
 		function split(code) {
 
@@ -31,6 +98,7 @@
 					});
 				}
 			}
+
 
 			var segs = [], unmatched, left_context,
 				next_match_idx = 0, prev_match_idx = 0
@@ -65,18 +133,25 @@
 				if (match) {
 					left_context = code.slice(0,next_match_idx - match[0].length);
 
+					console.log("match:" + match[0]);
+					console.log("left_context:" + left_context);
+					console.log("precedingDotOperator:" + precedingDotOperator(left_context));
+
+					// simple literal?
 					if (
-						match[0].match(/true|false|null|Infinity|NaN|undefined/) &&
-						!left_context.match(/\.$/)
+						/true|false|null|Infinity|NaN|undefined/.test(match[0]) &&
+						!precedingDotOperator(left_context)
 					) {
+						console.log("simple literal:" + match[0]);
 						segs.push({
 							type: SEGMENT_SIMPLE_LITERAL,
 							val: match[0]
 						});
 					}
+					// keyword?
 					else if (
-						match[0].match(/function|return|var|let|const|for|while|do|if|else|try|catch|finally|throw|break|continue|switch|case|default|delete|debugger|in|instanceof|new|this|typeof|void|with|class|export|import|extends|super|yield/) &&
-						!left_context.match(/\.\s*$/)
+						/function|return|var|let|const|for|while|do|if|else|try|catch|finally|throw|break|continue|switch|case|default|delete|debugger|in|instanceof|new|this|typeof|void|with|class|export|import|extends|super|yield/.test(match[0]) &&
+						!precedingDotOperator(left_context)
 					) {
 						segs.push({
 							type: SEGMENT_KEYWORD,
@@ -98,18 +173,18 @@
 			return segs;
 		}
 
-		var i, seg, segs,
+		var segment_idx, seg, segs,
 			pattern = /\b(?:true|false|null|Infinity|NaN|undefined|function|return|var|let|const|for|while|do|if|else|try|catch|finally|throw|break|continue|switch|case|default|delete|debugger|in|instanceof|new|this|typeof|void|with|class|export|import|extends|super|yield)\b|[`~!%&*()\-+=[\]{};:<>,.\/?\\|]/g
 		;
 
-		for (i=0; i<segments.length; i++) {
-			if (segments[i].type === LIT.SEGMENT.GENERAL) {
-				seg = segments[i];
+		for (segment_idx=0; segment_idx<segments.length; segment_idx++) {
+			if (segments[segment_idx].type === LIT.SEGMENT.GENERAL) {
+				seg = segments[segment_idx];
 
 				segs = split(seg.val);
 				if (segs.length > 0) {
-					segments.splice.apply([i,1].concat(segments),segs);
-					i += segs.length - 2;
+					segments.splice.apply(segments,[segment_idx,1].concat(segs));
+					segment_idx += segs.length - 1;
 				}
 			}
 		}
@@ -187,7 +262,7 @@
 			regex: "color:#090;font-weight:bold;",
 			number: "color:#900;font-weight:bold;",
 			simple: "color:#009;font-style:italic;",
-			keyword: "color:#660;font-weight:bold;",
+			keyword: "color:#960;font-weight:bold;",
 			operator: "color:#0aa;font-weight:bold;"
 		},
 
