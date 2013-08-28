@@ -35,7 +35,7 @@
 			var segs = [], unmatched, left_context,
 				next_match_idx = 0, prev_match_idx = 0
 			;
-			
+
 			while (next_match_idx < code.length) {
 				unmatched = "";
 
@@ -76,7 +76,7 @@
 					}
 					else if (
 						match[0].match(/function|return|var|let|const|for|while|do|if|else|try|catch|finally|throw|break|continue|switch|case|default|delete|debugger|in|instanceof|new|this|typeof|void|with|class|export|import|extends|super|yield/) &&
-						!left_context.match(/\.$/)
+						!left_context.match(/\.\s*$/)
 					) {
 						segs.push({
 							type: SEGMENT_KEYWORD,
@@ -108,8 +108,7 @@
 
 				segs = split(seg.val);
 				if (segs.length > 0) {
-					segs.unshift(i,1); // add splice arguments onto front of array
-					segments.splice.apply(segments,segs);
+					segments.splice.apply([i,1].concat(segments),segs);
 					i += segs.length - 2;
 				}
 			}
