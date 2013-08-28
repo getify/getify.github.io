@@ -1,5 +1,5 @@
 /*! literalizer
-    v0.2.3-a (c) Kyle Simpson
+    v0.2.3-b (c) Kyle Simpson
     MIT License: http://getify.mit-license.org
 */
 
@@ -345,7 +345,7 @@
 					tok = tokens[tok_idx];
 
 					// keyword preceeded by a . operator?
-					if (/\.$/.test(tok.val) &&
+					if (/\.\s*$/.test(tok.val) &&
 						tok.type !== SEGMENT_NUMBER_LITERAL
 					) {
 						// not actually a keyword, just a dot-accessed property
