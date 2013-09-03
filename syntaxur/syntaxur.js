@@ -25,11 +25,9 @@
 			// comment?
 			seg.type === LIT.SEGMENT.COMMENT
 		) {
-			console.log("not useful: " + JSON.stringify(seg));
 			return false;
 		}
 		else {
-			console.log("useful: " + JSON.stringify(seg));
 			return true;
 		}
 	}
@@ -133,16 +131,11 @@
 				if (match) {
 					left_context = code.slice(0,next_match_idx - match[0].length);
 
-					console.log("match:" + match[0]);
-					console.log("left_context:" + left_context);
-					console.log("precedingDotOperator:" + precedingDotOperator(left_context));
-
 					// simple literal?
 					if (
 						/true|false|null|Infinity|NaN|undefined/.test(match[0]) &&
 						!precedingDotOperator(left_context)
 					) {
-						console.log("simple literal:" + match[0]);
 						segs.push({
 							type: SEGMENT_SIMPLE_LITERAL,
 							val: match[0]
@@ -150,7 +143,7 @@
 					}
 					// keyword?
 					else if (
-						/function|return|var|let|const|for|while|do|if|else|try|catch|finally|throw|break|continue|switch|case|default|delete|debugger|in|instanceof|new|this|typeof|void|with|class|export|import|extends|super|yield/.test(match[0]) &&
+						/function|return|var|let|const|for|while|do|if|else|try|catch|finally|throw|break|continue|switch|case|default|delete|debugger|in|of|instanceof|new|this|typeof|void|with|class|export|import|extends|super|yield/.test(match[0]) &&
 						!precedingDotOperator(left_context)
 					) {
 						segs.push({
@@ -174,7 +167,7 @@
 		}
 
 		var segment_idx, seg, segs,
-			pattern = /\b(?:true|false|null|Infinity|NaN|undefined|function|return|var|let|const|for|while|do|if|else|try|catch|finally|throw|break|continue|switch|case|default|delete|debugger|in|instanceof|new|this|typeof|void|with|class|export|import|extends|super|yield)\b|[`~!%&*()\-+=[\]{};:<>,.\/?\\|]/g
+			pattern = /\b(?:true|false|null|Infinity|NaN|undefined|function|return|var|let|const|for|while|do|if|else|try|catch|finally|throw|break|continue|switch|case|default|delete|debugger|in|of|instanceof|new|this|typeof|void|with|class|export|import|extends|super|yield)\b|[`~!%&*()\-+=[\]{};:<>,.\/?\\|]/g
 		;
 
 		for (segment_idx=0; segment_idx<segments.length; segment_idx++) {
