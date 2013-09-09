@@ -1,12 +1,12 @@
 /*! syntaxur
-    v0.0.1-a (c) Kyle Simpson
+    v0.1.0-a (c) Kyle Simpson
     MIT License: http://getify.mit-license.org
 */
 
 (function UMD(name,context,definition) {
 	if (typeof module != "undefined" && module.exports) module.exports = definition();
 	else if (typeof define == "function" && define.amd) define(definition);
-	else context[name] = definition();
+	else context[name] = definition(name,context);
 })("Syntaxur",this,function definition(name,context) {
 
 	function entityifyHTMLTagStart(code) {
@@ -131,18 +131,8 @@
 				if (match) {
 					left_context = code.slice(0,next_match_idx - match[0].length);
 
-					// simple literal?
-					if (
-						/true|false|null|Infinity|NaN|undefined/.test(match[0]) &&
-						!precedingDotOperator(left_context)
-					) {
-						segs.push({
-							type: SEGMENT_SIMPLE_LITERAL,
-							val: match[0]
-						});
-					}
 					// keyword?
-					else if (
+					if (
 						/function|return|var|let|const|for|while|do|if|else|try|catch|finally|throw|break|continue|switch|case|default|delete|debugger|in|of|instanceof|new|this|typeof|void|with|class|export|import|extends|super|yield/.test(match[0]) &&
 						!precedingDotOperator(left_context)
 					) {
@@ -151,6 +141,7 @@
 							val: match[0]
 						});
 					}
+					// operator?
 					else if (match[0].match(/[`~!%&*()\-+=[\]{};:<>,.\/?\\|]/)) {
 						segs.push({
 							type: SEGMENT_OPERATOR,
@@ -167,7 +158,7 @@
 		}
 
 		var segment_idx, seg, segs,
-			pattern = /\b(?:true|false|null|Infinity|NaN|undefined|function|return|var|let|const|for|while|do|if|else|try|catch|finally|throw|break|continue|switch|case|default|delete|debugger|in|of|instanceof|new|this|typeof|void|with|class|export|import|extends|super|yield)\b|[`~!%&*()\-+=[\]{};:<>,.\/?\\|]/g
+			pattern = /\b(?:function|return|var|let|const|for|while|do|if|else|try|catch|finally|throw|break|continue|switch|case|default|delete|debugger|in|of|instanceof|new|this|typeof|void|with|class|export|import|extends|super|yield)\b|[`~!%&*()\-+=[\]{};:<>,.\/?\\|]/g
 		;
 
 		for (segment_idx=0; segment_idx<segments.length; segment_idx++) {
@@ -197,11 +188,6 @@
 			if (segments[i].type === LIT.SEGMENT.GENERAL) {
 				ret += entityifyHTMLTagStart(segments[i].val);
 			}
-			else if (segments[i].type === SEGMENT_SIMPLE_LITERAL) {
-				ret += "<span style=\"" + (public_api.options.simple || default_opts.simple) + "\">";
-				ret += segments[i].val;
-				ret += "</span>";
-			}
 			else if (segments[i].type === SEGMENT_KEYWORD) {
 				ret += "<span style=\"" + (public_api.options.keyword || default_opts.keyword) + "\">";
 				ret += segments[i].val;
@@ -219,7 +205,7 @@
 			}
 			else if (segments[i].type === LIT.SEGMENT.STRING_LITERAL) {
 				ret += "<span style=\"" + (public_api.options.string || default_opts.string) + "\">";
-				ret += entityifyHTMLTagStart(segments[i].val);
+				ret += entityifyHTMLTagStart(segments[i].raw);
 				ret += "</span>";
 			}
 			else if (segments[i].type === LIT.SEGMENT.BACKTICK_LITERAL) {
@@ -234,6 +220,11 @@
 			}
 			else if (segments[i].type === LIT.SEGMENT.NUMBER_LITERAL) {
 				ret += "<span style=\"" + (public_api.options.number || default_opts.number) + "\">";
+				ret += segments[i].val;
+				ret += "</span>";
+			}
+			else if (segments[i].type === LIT.SEGMENT.SIMPLE_LITERAL) {
+				ret += "<span style=\"" + (public_api.options.simple || default_opts.simple) + "\">";
 				ret += segments[i].val;
 				ret += "</span>";
 			}
@@ -264,6 +255,10 @@
 			highlight: highlight
 		}
 	;
+
+	// get literalizer to identify as much as we can!
+	LIT.opts.identify_number_literals = true;
+	LIT.opts.identify_simple_literals = true;
 
 	return public_api;
 });
