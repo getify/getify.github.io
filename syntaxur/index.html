@@ -45,8 +45,15 @@ $("#format").click(function(evt){
 			html = Syntaxur.highlight(source);
 			t2 = Date.now();
 
-			$("#time").text("Highlighting (not including DOM manipulation) took: " + (t2-t1) + "ms");
-			$("code").html(html);
+			$("#time").text("Highlighting (not including DOM manipulation) took: " + (t2-t1) + "ms. DOM manipulation...");
+
+			setTimeout(function(){
+				t1 = Date.now();
+				$("code").html(html);
+				t2 = Date.now();
+
+				$("#time").text($("#time").text() + " took: " + (t2-t1) + "ms)");
+			},50);
 		},50);
 	},500);
 });
