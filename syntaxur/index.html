@@ -48,9 +48,11 @@ $("#format").click(function(evt){
 			$("#time").text("Highlighting (not including DOM manipulation) took: " + (t2-t1) + "ms. DOM manipulation...");
 
 			setTimeout(function(){
+				$("code").hide();
 				t1 = Date.now();
 				$("code").html(html);
 				t2 = Date.now();
+				$("code").show();
 
 				$("#time").text($("#time").text() + " took: " + (t2-t1) + "ms)");
 			},50);
