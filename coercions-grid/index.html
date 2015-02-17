@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>JavaScript Coercions Grid</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<h1>JavaScript Coercions Grid</h1>
+
+<div id="legend" title="legend">
+	<div class="exception" title="Exception!">Exception!</div>
+	<div class="wtf" title="Value Coercion WTF">Value Coercion WTF</div>
+	<div class="fixedwtf" title="Fixed WTF">Fixed WTF</div>
+</div>
+<p>This tool is designed to help visualize JS's value coercion corner cases, specifically the ones that are WTFs, and to see what effect fixing some or all of them can have on the landscape of values.</p>
+<p>For lots more information on this topic, please check out <a href="http://davidwalsh.name/fixing-coercion" target="_blank">Fixing Coercion, Not The Symptoms</a>.</p>
+
+<br style="clear:both;"><br>
+
+<div id="controls_holder">
+	<div id="calltoaction">&#8592; You should try this!</div>
+	<a href="#" id="open_controls">settings</a>
+</div>
+<div id="controls">
+	<input id="hide_extra_columns" type="checkbox" checked> <label for="hide_extra_columns">hide extra columns</label><br>
+	<input id="show_wtf_assertions" type="checkbox" checked> <label for="show_wtf_assertions">mark value coercion wtfs</label><br>
+	<fieldset>
+		<legend>Fix Value Coercions (aka "use proper")</legend>
+		<input id="fix_str_num_nan" type="checkbox"> <label for="fix_str_num_nan"><code>Number("")</code> &#8594; <code>NaN</code></label><br>
+		<input id="fix_null_num_nan" type="checkbox"> <label for="fix_null_num_nan"><code>Number(null)</code> &#8594; <code>NaN</code></label><br>
+		<input id="fix_bool_num_nan" type="checkbox"> <label for="fix_bool_num_nan"><code>Number(true), Number(false)</code> &#8594; <code>NaN</code></label><br>
+		<input id="fix_array_prim" type="checkbox"> <label for="fix_array_prim"><code>String([..]), Number([..])</code> &#8594; <code>'[..]', NaN</code></label><br>
+		<input id="fix_object_prim" type="checkbox"> <label for="fix_object_prim"><code>String({..}), Number({..})</code> &#8594; <code>'{..}', NaN</code></label><br>
+	</fieldset>
+</div>
+
+<br><br>
+
+<table id="grid" class="hideExtended"></table>
+
+<br><br>
+<hr>
+<br><br>
+
+<h2>Extended Coercions</h2>
+
+<p><strong>Note:</strong> These are all deliberately tricky objects and as such the "proper" coercive behavior is a lot more subject to debate. I'll leave these unmarked (for now).</p>
+
+<table id="grid2" class="hideExtended"></table>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="grid.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,109 @@
+table {
+	font-family: monospace;
+	border-collapse: collapse;
+}
+
+td, th {
+	white-space: nowrap;
+	border: 1px solid #666;
+	padding: 4px 15px;
+	max-width: 250px;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	cursor: default;
+}
+
+th {
+	background-color: #eee;
+}
+
+td.value {
+	background-color: #eee;
+}
+
+tr:hover td {
+	background-color: #bddcff;
+}
+
+.exception, td.exception, tr:hover td.exception {
+	background-color: #ff6a6a;
+}
+
+.wtf, td.wtf, tr:hover td.wtf {
+	background-color: #fd7;
+	font-weight: bold;
+	cursor: not-allowed;
+}
+
+.fixedwtf, td.fixedwtf, tr:hover td.fixedwtf {
+	background-color: #8f5;
+	cursor: help;
+}
+
+table.hideExtended td:nth-child(4), table.hideExtended th:nth-child(4),
+table.hideExtended td:nth-child(6), table.hideExtended th:nth-child(6),
+table.hideExtended td:nth-child(10), table.hideExtended th:nth-child(10),
+table.hideExtended td:nth-child(11), table.hideExtended th:nth-child(11),
+table.hideExtended td:nth-child(12), table.hideExtended th:nth-child(12),
+table.hideExtended td:nth-child(13), table.hideExtended th:nth-child(13) {
+	display: none;
+}
+
+#controls_holder {
+	position: relative;
+}
+
+#open_controls {
+	display: inline-block;
+	text-decoration: none;
+	color: #000;
+	font-size: 17px;
+	font-weight: bold;
+}
+
+#open_controls::before {
+	font-size: 14px;
+	padding: 5px;
+	content: "▶";
+}
+
+#open_controls.open::before {
+	font-size: 14px;
+	padding: 4px;
+	content: "▼";
+}
+
+#controls {
+	display: none;
+	padding: 20px 5px;
+	background-color: #eee;
+}
+
+#controls fieldset {
+	display: inline-block;
+}
+
+#calltoaction {
+	position: absolute;
+	left: 100px;
+	top: -15px;
+	text-align: right;
+	padding: 10px;
+	max-width: 100px;
+	background-color: #8b8b00;
+	color: white;
+	font-weight: bold;
+}
+
+#legend {
+	float: left;
+	padding: 10px;
+	border: 1px solid #000;
+	margin-right: 15px;
+}
+
+#legend > div {
+	padding:5px;
+	margin: 5px 0px;
+	cursor: default;
+}
