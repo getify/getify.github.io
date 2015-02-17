@@ -760,12 +760,12 @@
 	runAssertions();
 
 
-	$("#open_controls").click(function(evt){
+	$("#open_controls, #calltoaction").click(function(evt){
 		evt.preventDefault();
 		evt.stopPropagation();
 		evt.stopImmediatePropagation();
 		$("#controls").toggle();
-		$(this).toggleClass("open");
+		$("#open_controls").toggleClass("open");
 		$("#calltoaction").hide();
 	});
 

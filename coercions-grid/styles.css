@@ -93,6 +93,7 @@ table.hideExtended td:nth-child(13), table.hideExtended th:nth-child(13) {
 	background-color: #8b8b00;
 	color: white;
 	font-weight: bold;
+	cursor: pointer;
 }
 
 #legend {
