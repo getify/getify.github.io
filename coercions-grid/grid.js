@@ -138,7 +138,7 @@
 		);
 	}
 
-	function assert(val,coercion,shouldBe) {
+	function lookupValIndexes(val,coercion) {
 		var val_idx, coercion_idx;
 
 		vals.some(function(v,idx){
@@ -154,6 +154,32 @@
 				return true;
 			}
 		});
+
+		return {
+			val_idx: val_idx,
+			coercion_idx: coercion_idx
+		};
+	}
+
+	function lookupVal(val,coercion) {
+		var lookup_indexes = lookupValIndexes(val,coercion),
+			val_idx = lookup_indexes.val_idx,
+			coercion_idx = lookup_indexes.coercion_idx
+		;
+
+		try {
+			return coercions[coercion_idx][0](vals[val_idx]);
+		}
+		catch (e) {
+			return "__";
+		}
+	}
+
+	function assert(val,coercion,shouldBe) {
+		var lookup_indexes = lookupValIndexes(val,coercion),
+			val_idx = lookup_indexes.val_idx,
+			coercion_idx = lookup_indexes.coercion_idx
+		;
 
 		assertions[val_idx] = assertions[val_idx] || [];
 		assertions[val_idx][coercion_idx] = shouldBe;
@@ -292,10 +318,15 @@
 		assert("[function(){}]","x + ''","'[function (){}]'");
 		assert("[function(){}]","x.toString()","'[function (){}]'");
 		assert("[function(){}]","x + 0","'[function (){}]0'");
-		assert("[Symbol('')]","String(x)","Exception!");
-		assert("[Symbol('')]","x + ''","Exception!");
-		assert("[Symbol('')]","x.toString()","Exception!");
-		assert("[Symbol('')]","x + 0","Exception!");
+
+		if (lookupVal("[Symbol('')]","String(x)") != "__") {
+			assert("[Symbol('')]","String(x)","Exception!");
+			assert("[Symbol('')]","x + ''","Exception!");
+			assert("[Symbol('')]","x.toString()","Exception!");
+			assert("[Symbol('')]","Number(x), +x","Exception!");
+			assert("[Symbol('')]","x * 1","Exception!");
+			assert("[Symbol('')]","x + 0","Exception!");
+		}
 
 		assert("{}","String(x)","{}");
 		assert("{}","x + ''","{}");
@@ -321,10 +352,13 @@
 		assert("{'':function(){}}","x + ''","{'':function (){}}");
 		assert("{'':function(){}}","x.toString()","{'':function (){}}");
 		assert("{'':function(){}}","x + 0","{'':function (){}}0");
-		assert("{Symbol(''):null}","String(x)","{Symbol():null}");
-		assert("{Symbol(''):null}","x + ''","{Symbol():null}");
-		assert("{Symbol(''):null}","x.toString()","{Symbol():null}");
-		assert("{Symbol(''):null}","x + 0","{Symbol():null}0");
+
+		assert("{Symbol(''):null}","String(x)","Exception!");
+		assert("{Symbol(''):null}","x + ''","Exception!");
+		assert("{Symbol(''):null}","x.toString()","Exception!");
+		assert("{Symbol(''):null}","Number(x), +x","Exception!");
+		assert("{Symbol(''):null}","x * 1","Exception!");
+		assert("{Symbol(''):null}","x + 0","Exception!");
 	}
 
 	function runAssertions() {
