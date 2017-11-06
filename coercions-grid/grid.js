@@ -15,8 +15,6 @@
 	}
 
 	function formatValue(x) {
-		var ret;
-
 		if (typeof x == "string") {
 			return "'" + x.replace(/\n/g,"\\n") + "'";
 		}

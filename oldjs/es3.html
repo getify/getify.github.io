@@ -1,0 +1,17 @@
+<html>
+<p>ES3</p>
+<script>
+var str = "Hello World!";
+
+try {
+	var r = /^he/i;
+	if (r.test(str) === false) {
+		throw new Error("Oops!");
+	}
+	alert(str);
+}
+catch (err) {
+	alert(err);
+}
+</script>
+</html>
