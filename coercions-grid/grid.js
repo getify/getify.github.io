@@ -190,7 +190,7 @@
 		assert("-0","String(x)","'-0'");
 		assert("-0","x + ''","'-0'");
 		assert("-0","x.toString()","'-0'");
-		assert("-0","x + 0","-0");
+		assert("-0","x + 0","0");
 		assert("''","Number(x), +x","NaN");
 		assert("''","x * 1","NaN");
 		assert("'  '","Number(x), +x","NaN");
